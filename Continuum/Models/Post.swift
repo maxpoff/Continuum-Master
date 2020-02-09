@@ -9,6 +9,7 @@
 import UIKit
 import CloudKit
 
+//MARK: - String Constants
 struct PostConstants {
     
     static let typeKey = "Post"
@@ -17,8 +18,9 @@ struct PostConstants {
     static let commentsKey = "comments"
     static let photoKey = "photo"
     static let commentCountKey = "commentCount"
-}
+}//End of struct
 
+//MARK: - Class Model
 class Post {
     
     var photoData: Data?
@@ -62,6 +64,7 @@ class Post {
         self.photo = photo
     }
     
+    //MARK: - TURN THIS INTO AN EXTENSION
     init?(ckRecord: CKRecord) {
         do {
             guard let caption = ckRecord[PostConstants.captionKey] as? String,
@@ -82,11 +85,26 @@ class Post {
             return nil
         }
     }
-}
+}//End of class
 
 //MARK: - Extensions
+extension CKRecord {
+    
+    convenience init(post: Post) {
+        
+        self.init(recordType: PostConstants.typeKey, recordID: post.recordID)
+        
+        self.setValuesForKeys([PostConstants.captionKey : post.caption,
+                               PostConstants.timestampKey : post.timestamp,
+                               PostConstants.photoKey : post.imageAsset,
+                               PostConstants.commentCountKey : post.commentCount])
+    }
+}
+
 extension Post: SearchableRecord {
+    
     func matches(searchTerm: String) -> Bool {
+        
         if caption.lowercased().contains(searchTerm.lowercased()) {
             return true
         } else {

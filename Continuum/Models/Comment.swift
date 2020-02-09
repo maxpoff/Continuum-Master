@@ -9,14 +9,16 @@
 import Foundation
 import CloudKit
 
+//MARK: - String Constants
 struct CommentConstants {
     
     static let recordType = "Comment"
     static let textKey = "text"
     static let timestampKey = "timestamp"
     static let postReferenceKey = "post"
-}
+}//End of struct
 
+//MARK: - Class Model
 class Comment {
     
     let text: String
@@ -36,15 +38,29 @@ class Comment {
         self.recordID = recordID
     }
     
+    //MARK: - TURN THIS INTO AN EXTENSION
     convenience init?(ckRecord: CKRecord, post: Post){
         guard let text = ckRecord[CommentConstants.textKey] as? String,
             let timestamp = ckRecord[CommentConstants.timestampKey] as? Date else { return nil }
         self.init(text: text, post: post, timestamp: timestamp, recordID: ckRecord.recordID)
     }
-}
+}//End of class
+
+//MARK: - Extensions
+extension CKRecord {
+    
+    convenience init(comment: Comment) {
+        
+        self.init(recordType: CommentConstants.recordType, recordID: comment.recordID)
+        
+        self.setValuesForKeys([CommentConstants.postReferenceKey : comment.postReference,
+                               CommentConstants.textKey : comment.text,
+                               CommentConstants.timestampKey : comment.timestamp])
+    }
+}//End of extension
 
 extension Comment: SearchableRecord {
     func matches(searchTerm: String) -> Bool {
-        return text.contains(searchTerm)
+        return text.lowercased().contains(searchTerm.lowercased())
     }
-}
+}//End of extension

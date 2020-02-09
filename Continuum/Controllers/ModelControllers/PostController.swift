@@ -12,8 +12,9 @@ import CloudKit
 class PostController {
     
     //MARK: - Properties
-    static let shared = PostController()
+    static let sharedInstance = PostController()
     var posts: [Post] = []
+    let publicDB = CKContainer.default().publicCloudDatabase
     private init() {
         subscribeToNewPosts(completion: nil)
     }
@@ -27,7 +28,7 @@ class PostController {
         
         let record = CKRecord(comment: comment)
         
-        CKContainer.default().publicCloudDatabase.save(record) { (record, error) in
+        publicDB.save(record) { (record, error) in
             
             if let error = error {
                 print("Error in \(#function) : \(error.localizedDescription) \n---\n \(error)" )
@@ -52,7 +53,7 @@ class PostController {
         
         let record = CKRecord(post: post)
         
-        CKContainer.default().publicCloudDatabase.save(record) { (record, error) in
+        publicDB.save(record) { (record, error) in
             
             if let error = error{
                 print("Error in \(#function) : \(error.localizedDescription) \n---\n \(error)" )
@@ -73,7 +74,7 @@ class PostController {
         
         let query = CKQuery(recordType: PostConstants.typeKey, predicate: predicate)
         
-        CKContainer.default().publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+        publicDB.perform(query, inZoneWith: nil) { (records, error) in
             
             if let error = error{
                 print("Error in \(#function) : \(error.localizedDescription) \n---\n \(error)" )
@@ -103,7 +104,7 @@ class PostController {
         
         let query = CKQuery(recordType: "Comment", predicate: compoundPredicate)
         
-        CKContainer.default().publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+        publicDB.perform(query, inZoneWith: nil) { (records, error) in
             
             if let error = error {
                 print("Error fetching comments \(#function) \(error) \(error.localizedDescription)")
@@ -138,7 +139,7 @@ class PostController {
                 completion?(true)
             }
         }
-        CKContainer.default().publicCloudDatabase.add(modifyOperation)
+        publicDB.add(modifyOperation)
     }
     
     //MARK: - CK Methods (Subscriptions)
@@ -155,7 +156,7 @@ class PostController {
         notifcationInfo.shouldSendContentAvailable = true
         subscription.notificationInfo = notifcationInfo
         
-        CKContainer.default().publicCloudDatabase.save(subscription) { (subscription, error) in
+        publicDB.save(subscription) { (subscription, error) in
             
             if let error = error {
                 print("There was an error in \(#function) ; \(error)  ; \(error.localizedDescription)")
@@ -181,13 +182,13 @@ class PostController {
         notificationInfo.desiredKeys = nil
         subscription.notificationInfo = notificationInfo
         
-        CKContainer.default().publicCloudDatabase.save(subscription) { (_, error) in
+        publicDB.save(subscription) { (_, error) in
             
             if let error = error {
                 print("There was an error in \(#function) ; \(error)  ; \(error.localizedDescription)")
                 completion?(false, error)
                 return
-            } else{
+            } else {
                 completion?(true, nil)
             }
         }
@@ -197,7 +198,7 @@ class PostController {
         
         let subscriptionID = post.recordID.recordName
         
-        CKContainer.default().publicCloudDatabase.delete(withSubscriptionID: subscriptionID) { (_, error) in
+        publicDB.delete(withSubscriptionID: subscriptionID) { (_, error) in
             
             if let error = error {
                 print("There was an error in \(#function) ; \(error)  ; \(error.localizedDescription)")
@@ -214,7 +215,7 @@ class PostController {
         
         let subscriptionID = post.recordID.recordName
         
-        CKContainer.default().publicCloudDatabase.fetch(withSubscriptionID: subscriptionID) { (subscription, error) in
+        publicDB.fetch(withSubscriptionID: subscriptionID) { (subscription, error) in
             
             if let error = error {
                 print("There was an error in \(#function) ; \(error)  ; \(error.localizedDescription)")
