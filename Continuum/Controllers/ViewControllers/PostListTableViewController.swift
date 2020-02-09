@@ -84,8 +84,13 @@ class PostListTableViewController: UITableViewController {
 extension PostListTableViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
-        resultsArray = PostController.sharedInstance.posts.filter { $0.matches(searchTerm: searchText) }
-        tableView.reloadData()
+        if !searchText.isEmpty {
+            resultsArray = PostController.sharedInstance.posts.filter { $0.matches(searchTerm: searchText) }
+            tableView.reloadData()
+        } else {
+            resultsArray = PostController.sharedInstance.posts
+            tableView.reloadData()
+        }
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

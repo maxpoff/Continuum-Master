@@ -310,11 +310,11 @@
             </objects>
             <point key="canvasLocation" x="-809" y="281"/>
         </scene>
-        <!--Item-->
+        <!--Feed-->
         <scene sceneID="KV2-1q-Hm6">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="nSb-jf-jU7" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="uv3-hZ-ghh"/>
+                    <tabBarItem key="tabBarItem" title="Feed" id="uv3-hZ-ghh"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="XJ6-wT-cAM">
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>
@@ -329,11 +329,11 @@
             </objects>
             <point key="canvasLocation" x="368.80000000000001" y="-126.38680659670166"/>
         </scene>
-        <!--Item-->
+        <!--Create Post-->
         <scene sceneID="Vsk-jw-Q6n">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="EcT-tC-zKN" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="8Sr-f5-hxd"/>
+                    <tabBarItem key="tabBarItem" title="Create Post" id="8Sr-f5-hxd"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="axO-TE-YTB">
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>
