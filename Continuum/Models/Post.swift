@@ -54,7 +54,7 @@ class Post {
         }
     }
     
-    init(photo: UIImage, caption: String, timestamp: Date = Date(), comments: [Comment] = [], recordID: CKRecord.ID = CKRecord.ID(recordName: UUID().uuidString), commentCount: Int = 0) {
+    init(photo: UIImage?, caption: String, timestamp: Date = Date(), comments: [Comment] = [], recordID: CKRecord.ID = CKRecord.ID(recordName: UUID().uuidString), commentCount: Int = 0) {
         
         self.caption = caption
         self.timestamp = timestamp
@@ -63,41 +63,47 @@ class Post {
         self.commentCount = commentCount
         self.photo = photo
     }
-    
-    //MARK: - TURN THIS INTO AN EXTENSION
-    init?(ckRecord: CKRecord) {
-        do {
-            guard let caption = ckRecord[PostConstants.captionKey] as? String,
-                let timestamp = ckRecord[PostConstants.timestampKey] as? Date,
-                let photoAsset = ckRecord[PostConstants.photoKey] as? CKAsset,
-                let commentCount = ckRecord[PostConstants.commentCountKey] as? Int
-                else { return nil}
-            
-            let photoData = try Data(contentsOf: photoAsset.fileURL!)
-            self.caption = caption
-            self.timestamp = timestamp
-            self.photoData = photoData
-            self.recordID = ckRecord.recordID
-            self.commentCount = commentCount
-            self.comments = []
-        } catch {
-            print("There was as error in \(#function) :  \(error) \(error.localizedDescription)")
-            return nil
-        }
-    }
 }//End of class
 
 //MARK: - Extensions
+extension Post {
+    
+    convenience init?(ckRecord: CKRecord) {
+        guard let caption = ckRecord[PostConstants.captionKey] as? String,
+            let timestamp = ckRecord[PostConstants.timestampKey] as? Date,
+            let commentCount = ckRecord[PostConstants.commentCountKey] as? Int
+            else { return nil}
+        
+        var postPhoto: UIImage?
+        
+        if let photoAsset = ckRecord[PostConstants.photoKey] as? CKAsset {
+            do {
+                guard let url = photoAsset.fileURL else {return nil}
+                let data = try Data(contentsOf: url)
+                postPhoto = UIImage(data: data)
+            } catch {
+                print("Could not transfrom asset to data.")
+            }
+        }
+        self.init(photo: postPhoto, caption: caption, timestamp: timestamp, comments: [], recordID: ckRecord.recordID, commentCount: commentCount)
+    }
+}//End of extension
+
 extension CKRecord {
     
     convenience init(post: Post) {
         
         self.init(recordType: PostConstants.typeKey, recordID: post.recordID)
         
-        self.setValuesForKeys([PostConstants.captionKey : post.caption,
-                               PostConstants.timestampKey : post.timestamp,
-                               PostConstants.photoKey : post.imageAsset,
-                               PostConstants.commentCountKey : post.commentCount])
+        self.setValuesForKeys([
+            PostConstants.captionKey : post.caption,
+            PostConstants.timestampKey : post.timestamp,
+            PostConstants.commentCountKey : post.commentCount
+        ])
+        
+        if let postPhoto = post.imageAsset {
+            self.setValue(postPhoto, forKey: PostConstants.photoKey)
+        }
     }
 }
 

@@ -23,39 +23,44 @@ class Comment {
     
     let text: String
     let timestamp: Date
-    weak var post: Post?
     let recordID: CKRecord.ID
+    var postReference: CKRecord.Reference?
     
-    var postReference: CKRecord.Reference? {
-        guard let post = post else { return nil }
-        return CKRecord.Reference(recordID: post.recordID, action: .deleteSelf)
-    }
-    
-    init(text: String, post: Post, timestamp: Date = Date(), recordID: CKRecord.ID = CKRecord.ID(recordName: UUID().uuidString)) {
+    init(text: String, timestamp: Date = Date(), recordID: CKRecord.ID = CKRecord.ID(recordName: UUID().uuidString), postReference: CKRecord.Reference?) {
         self.text = text
-        self.post = post
         self.timestamp = timestamp
         self.recordID = recordID
-    }
-    
-    //MARK: - TURN THIS INTO AN EXTENSION
-    convenience init?(ckRecord: CKRecord, post: Post){
-        guard let text = ckRecord[CommentConstants.textKey] as? String,
-            let timestamp = ckRecord[CommentConstants.timestampKey] as? Date else { return nil }
-        self.init(text: text, post: post, timestamp: timestamp, recordID: ckRecord.recordID)
+        self.postReference = postReference
     }
 }//End of class
 
 //MARK: - Extensions
+extension Comment {
+    
+    convenience init?(ckRecord: CKRecord) {
+        guard let text = ckRecord[CommentConstants.textKey] as? String,
+            let timestamp = ckRecord[CommentConstants.timestampKey] as? Date else { return nil }
+        
+        let postReference = ckRecord[CommentConstants.postReferenceKey] as? CKRecord.Reference
+        
+        self.init(text: text, timestamp: timestamp, recordID: ckRecord.recordID, postReference: postReference)
+    }
+}//End of extension
+
 extension CKRecord {
     
     convenience init(comment: Comment) {
         
         self.init(recordType: CommentConstants.recordType, recordID: comment.recordID)
         
-        self.setValuesForKeys([CommentConstants.postReferenceKey : comment.postReference,
-                               CommentConstants.textKey : comment.text,
-                               CommentConstants.timestampKey : comment.timestamp])
+        self.setValuesForKeys([
+            CommentConstants.textKey : comment.text,
+            CommentConstants.timestampKey : comment.timestamp
+        ])
+        
+        if let reference = comment.postReference {
+            self.setValue(reference, forKey: CommentConstants.postReferenceKey)
+        }
     }
 }//End of extension
 

@@ -22,7 +22,9 @@ class PostController {
     //MARK: - CK Methods (Create)
     func addComment(text: String, post: Post, completion: @escaping (Comment?) -> Void) {
         
-        let comment = Comment(text: text, post: post)
+        let postReference = CKRecord.Reference(recordID: post.recordID, action: .none)
+        
+        let comment = Comment(text: text, postReference: postReference)
         
         post.comments.append(comment)
         
@@ -37,7 +39,7 @@ class PostController {
             
             guard let record = record else { return completion(nil) }
             
-            let comment = Comment(ckRecord: record, post: post)
+            let comment = Comment(ckRecord: record)
             
             self.incrementCommentCount(for: post, completion: nil)
             
@@ -112,7 +114,7 @@ class PostController {
             }
             guard let records = records else { completion(nil); return }
             
-            let comments = records.compactMap{ Comment(ckRecord: $0, post: post) }
+            let comments = records.compactMap{ Comment(ckRecord: $0) }
             
             post.comments.append(contentsOf: comments)
             
