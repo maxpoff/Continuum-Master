@@ -112,7 +112,7 @@ class PostController {
                 print("Error fetching comments \(#function) \(error) \(error.localizedDescription)")
                 return completion(nil)
             }
-            guard let records = records else { completion(nil); return }
+            guard let records = records else { return completion(nil) }
             
             let comments = records.compactMap{ Comment(ckRecord: $0) }
             

@@ -105,7 +105,7 @@ extension CKRecord {
             self.setValue(postPhoto, forKey: PostConstants.photoKey)
         }
     }
-}
+}//End of extension
 
 extension Post: SearchableRecord {
     
